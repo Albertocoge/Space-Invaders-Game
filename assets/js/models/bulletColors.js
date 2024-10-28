@@ -8,4 +8,4 @@ function getColorFromImagePath(imagePath) {
     return "#0000FF";
 }
 
-    window.getColorFromImagePath = getColorFromImagePath;
+window.getColorFromImagePath = getColorFromImagePath;

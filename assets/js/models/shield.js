@@ -10,7 +10,7 @@ class Shield {
         this.alive = true;
 
         this.sprite = new Image();
-        this.sprite.src = "/assets/img/shield.png";
+        this.sprite.src = "assets/img/shield.png";
         this.sprite.isReady = false;
 
         this.sprite.onload = () => {

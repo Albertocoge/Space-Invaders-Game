@@ -402,6 +402,7 @@ class Game {
     }
 
     // Método para manejar el impacto en el jugador
+    
     handlePlayerHit() {
         this.player.hit();
 
