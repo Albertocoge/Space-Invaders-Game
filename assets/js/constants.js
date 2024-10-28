@@ -14,5 +14,5 @@ const SPEED_BACKGROUND = 1;
 const SPEED_MOVE = 10;
 
 const SPEED_ENEMY = 0.3;
-const SPEED_ENEMY_VERTICAL = 3;
+const SPEED_ENEMY_VERTICAL = 4;
 

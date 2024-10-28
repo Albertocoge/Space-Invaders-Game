@@ -1,5 +1,5 @@
 class EnemyBullet {
-    constructor(ctx, x, y) {
+    constructor(ctx, x, y, color) {
         this.ctx = ctx;
         this.x = x;
         this.y = y;
@@ -7,6 +7,7 @@ class EnemyBullet {
         this.w = 3;
         this.h = 12;
         this.active = true;
+        this.color = color;
     }
 
     move() {
@@ -18,7 +19,7 @@ class EnemyBullet {
 
     draw(){
         this.ctx.save();
-        this.ctx.fillStyle = "#0000FF"; 
+        this.ctx.fillStyle = this.color; 
         this.ctx.fillRect(this.x, this.y, this.w, this.h);
         this.ctx.restore();
     }

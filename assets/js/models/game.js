@@ -29,7 +29,25 @@ class Game {
         this.directionChanged = false;
 
         this.state = GAME_STATES.MENU;
+
+        this.score = 0;
+
+        this.shields = [];
+        this.createShields();
+
+        this.shootMusic = document.getElementById('shootMusic');
+        this.invaderKilledMusic = document.getElementById('invaderKilledMusic');
+        
+
+      
+
+       
     }
+
+
+    
+       
+
 
     onKeyEvent(event) {
         if(this.state === GAME_STATES.PLAYING) {
@@ -78,6 +96,11 @@ class Game {
         this.enemyBullets.forEach(bullet => bullet.move());
         this.enemyBullets = this.enemyBullets.filter(bullet => bullet.active);
 
+        //Mover balas del jugador
+
+        this.player.bullets.forEach(bullet => bullet.move());
+        this.player.bullets = this.player.bullets.filter(bullet => bullet.active);
+
         // Verificar colisiones entre balas de enemigos y el jugador
         this.checkCollisions();
     }
@@ -92,8 +115,22 @@ class Game {
 
             // Dibujar balas de enemigos
             this.enemyBullets.forEach(bullet => bullet.draw());
+
+            //Dibujo escudos
+            this.shields.forEach(shield => shield.draw());
+
+            //Dibujar puntuación
+            this.drawScore();
+
+            //Dibujar salud player
+            this.drawHealth();
+        
         } else if (this.state === GAME_STATES.GAMEOVER) {
+            if (this.enemies.every(enemy => !enemy.alive)) {
+                this.drawVictory();
+            } else {
             this.drawGameOver();
+            }
         }
     }
 
@@ -127,8 +164,21 @@ class Game {
                 const y = offsetY + row * (enemyHeight + padding);
                 const imagePath = alienImages[row % alienImages.length];
                 const enemy = new Enemy(this.ctx, x, y, imagePath );
+                this.game = this;
                 this.enemies.push(enemy);
             }
+        }
+    }
+
+    createShields() {
+        const numberOfShields = 5;
+        const shieldSpacing = (CANVAS_W - (numberOfShields * 70)) / (numberOfShields + 1); 
+        const yPosition = this.canvas.height - 200; 
+
+        for (let i = 0; i < numberOfShields; i++) {
+            const xPosition = shieldSpacing + i * (70 + shieldSpacing); 
+            const shield = new Shield(this.ctx, xPosition, yPosition);
+            this.shields.push(shield);
         }
     }
 
@@ -176,11 +226,13 @@ class Game {
 
         // Texto del botón Play
         this.ctx.fillStyle = "black";
-        this.ctx.font = "24px Arial";
-        this.ctx.fillText("Play", this.canvas.width / 2, this.canvas.height / 2 + 35);
+        this.ctx.font = "20px Arial";
+        this.ctx.fillText("PLAY", this.canvas.width / 2, this.canvas.height / 2 + 35);
     }
 
+    
     // Método para dibujar la pantalla de Game Over
+
     drawGameOver() {
         this.clear();
 
@@ -192,15 +244,49 @@ class Game {
         this.ctx.textAlign = "center";
         this.ctx.fillText("GAME OVER", this.canvas.width / 2, this.canvas.height / 2 - 50);
 
+        // Mostrar puntuación final
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "24px Arial";
+        this.ctx.fillRect(`Puntuación: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2);
+
+        //Botón reiniciar
         this.ctx.fillStyle = "#00FF00";
         this.ctx.fillRect(this.canvas.width / 2 - 75, this.canvas.height / 2, 150, 50);
 
+        //Texto botón reiniciar
         this.ctx.fillStyle = "black";
         this.ctx.font = "24px Arial";
         this.ctx.fillText("Restart", this.canvas.width / 2, this.canvas.height / 2 + 35);
     }
 
+    drawVictory() {
+        this.clear();
+
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.fillStyle = "green";
+        this.ctx.font = "48px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("¡Ganaste!", this.canvas.width / 2, this.canvas.height / 2 - 50);
+
+        // Mostrar la puntuación final
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "24px Arial";
+        this.ctx.fillText(`Puntuación: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2);
+
+        // Botón de Reiniciar
+        this.ctx.fillStyle = "#00FF00";
+        this.ctx.fillRect(this.canvas.width / 2 - 75, this.canvas.height / 2 + 50, 150, 50);
+
+        // Texto del botón Reiniciar
+        this.ctx.fillStyle = "black";
+        this.ctx.font = "24px Arial";
+        this.ctx.fillText("Reiniciar", this.canvas.width / 2, this.canvas.height / 2 + 85);
+    }
+
     // Método para manejar clics en el canvas
+
     handleCanvasClick(x, y) {
         if (this.state === GAME_STATES.MENU) {
             const buttonX = this.canvas.width / 2 - 75;
@@ -217,8 +303,12 @@ class Game {
                 this.startGame();
             }
         } else if (this.state === GAME_STATES.GAMEOVER) {
-            const buttonX = this.canvas.width / 2 - 75;
-            const buttonY = this.canvas.height / 2;
+            const buttonX = this.state === GAME_STATES.GAMEOVER && this.enemies.every(enemy => !enemy.alive) 
+                ? this.canvas.width / 2 - 75 
+                : this.canvas.width / 2 - 75;
+            const buttonY = this.state === GAME_STATES.GAMEOVER && this.enemies.every(enemy => !enemy.alive) 
+            ? this.canvas.height / 2 + 50 
+            : this.canvas.height / 2;
             const buttonWidth = 150;
             const buttonHeight = 50;
 
@@ -237,32 +327,71 @@ class Game {
     startGame() {
         this.state = GAME_STATES.PLAYING;
         this.start();
+
     }
 
     // Método para reiniciar el juego
+
     restartGame() {
         // Reiniciar las propiedades del juego
+
         this.enemies = [];
         this.createEnemies();
         this.enemyBullets = [];
         this.player.reset();
         this.background.reset(); 
 
+        this.score = 0;
+
+        this.shields.forEach(shield => shield.reset());
+
         this.state = GAME_STATES.PLAYING;
         this.start();
     }
 
     // Método para verificar colisiones entre balas de enemigos y el jugador
+
     checkCollisions() {
         this.enemyBullets.forEach((bullet) => {
             if (this.isColliding(bullet, this.player)) {
                 bullet.active = false;
                 this.handlePlayerHit();
             }
+
+            this.shields.forEach(shield => {
+                if(shield.alive && this.isColliding(bullet, shield)){
+                    bullet.active = false;
+                    shield.hit();
+
+                }
+            })
         });
+      //Método colisiones balas jugador y enemigos 
+
+        this.player.bullets.forEach((bullet) => {
+            this.enemies.forEach((enemy) => {
+                if (enemy.alive && this.isColliding(bullet, enemy)) {
+                    enemy.hit();
+                    bullet.active = false;
+                    this.score += 10;
+                }
+            });
+            /*
+            this.shields.forEach(shield => {
+                if (shield.alive && this.isColliding(bullet, shield)) {
+                    bullet.active = false;
+                    shield.hit();
+                }
+        }); */
+    });
+
+        if(this.enemies.every(enemy => !enemy.alive)) {
+            this.handleVictory();
+        }
     }
 
     // Método para verificar colisiones entre dos objetos
+
     isColliding(a, b) {
         return !(
             a.x > b.x + b.w ||
@@ -276,7 +405,7 @@ class Game {
     handlePlayerHit() {
         this.player.hit();
 
-        if (this.player.lives > 0) {
+        if (this.player.health > 0) {
             // Reiniciar la posición del jugador
             this.player.reset();
         } else {
@@ -286,4 +415,26 @@ class Game {
             this.drawGameOver();
         }
     }
+
+    handleVictory() {
+        this.stop();
+        this.state = GAME_STATES.GAMEOVER;
+        this.drawVictory();
+    }
+
+    drawScore() {
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "20px Arial";
+        this.ctx.textAlign = "left";
+        this.ctx.fillText(`Score: ${this.score}`, 10, 30);
+    }
+
+    drawHealth() {
+        this.ctx.fillStyle = "white";
+        this.ctx.font = "20px Arial";
+        this.ctx.textAlign = "right";
+        this.ctx.fillText(`Health: ${this.player.health}`, this.canvas.width - 10, 30);
+    }
+
+  
 }

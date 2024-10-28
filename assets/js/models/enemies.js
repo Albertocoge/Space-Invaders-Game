@@ -9,6 +9,7 @@ class Enemy {
         this.vy = SPEED_ENEMY_VERTICAL;
         this.w = 50;
         this.h = 35;
+        this.alive = true;
 
         this.sprite = new Image();
         this.sprite.src = imagePath;
@@ -16,9 +17,15 @@ class Enemy {
 
         this.sprite.onload = () => {
             this.sprite.isReady = true;
-        }
+        };
+
+        this.sprite.onerror = () => {
+            console.error();
+        };
 
         this.bulletCooldown = 0;
+
+        this.color = getColorFromImagePath(imagePath);
     
     }
 
@@ -41,6 +48,8 @@ class Enemy {
     }
 
     draw() {
+        if(!this.alive) return;
+
         if(this.sprite.isReady) {
             this.ctx.drawImage(this.sprite, this.x, this.y, this.w, this.h);
         } else {
@@ -63,7 +72,25 @@ class Enemy {
 
     fire(enemyBullets) {
         const bulletX = this.x + this.w / 2 - 1.5;
-        const bulletY = this.y + this.h;
-        enemyBullets.push(new EnemyBullet(this.ctx, bulletX, bulletY));
+        const bulletY = this.y + this.h;0
+        enemyBullets.push(new EnemyBullet(this.ctx, bulletX, bulletY, this.color));
+
+        if (this.game && this.game.shootMusic) { 
+            this.game.shootMusic.currentTime = 0; 
+            this.game.shootMusic.play().catch((error) => {
+                console.log("No se pudo reproducir invaderKilledMusic automáticamente:", error);
+            });
+        }
     }
+
+    hit(damage = 10) {
+        this.alive = false;
+        
+        if (this.game && this.game.invaderKilledMusic) { 
+            this.game.invaderKilledMusic.currentTime = 0; 
+            this.game.invaderKilledMusic.play().catch((error) => {
+                console.log("No se pudo reproducir invaderKilledMusic automáticamente:", error);
+            });
+        }
+    }  
 }

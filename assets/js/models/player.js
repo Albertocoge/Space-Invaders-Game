@@ -20,6 +20,8 @@ class Player {
         }
 
         this.bullets = [];
+
+        this.health = 100;
         
         this.sprite = new Image();
         this.sprite.src = "/assets/img/cannon.png";
@@ -31,7 +33,14 @@ class Player {
             
     }
 
-    hit() {}
+    hit(damage = 20) {
+        this.health -= damage;
+        if(this.health <= 0) {
+            this.health = 0;
+            this.destroy();
+        }
+    
+    }
 
     reset() {
         this.x = this.initialX;
@@ -43,7 +52,10 @@ class Player {
             isShutting: false,
             firePressed: false
         }
+       
     }
+
+    destroy(){}
 
     
 
@@ -116,6 +128,7 @@ class Player {
                 this.h
             );
         }   else {
+            this.ctx.fillStyle = "green";
             this.ctx.fillRect(this.x, this.y, this.w, this.h);
         }
         
