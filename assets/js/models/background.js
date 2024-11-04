@@ -10,7 +10,7 @@ class Background {
         this.h = this.ctx.canvas.height;
 
         this.sprite = new Image();
-        this.sprite.src = "assets/img/universe1.png";
+        this.sprite.src = "./assets/img/universe1.png";
         this.sprite.isReady = false;
 
         this.sprite.onload = () => {

@@ -24,7 +24,7 @@ class Player {
         this.health = 100;
         
         this.sprite = new Image();
-        this.sprite.src = "assets/img/cannon.png";
+        this.sprite.src = "./assets/img/cannon.png";
         this.sprite.isReady = false;
 
         this.sprite.onload = () => {
