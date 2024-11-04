@@ -151,11 +151,11 @@ class Game {
         const offsetY = 30;
 
         const alienImages = [
-            "/assets/img/alien-magenta.png", 
-            "/assets/img/alien-yellow.png", 
-            "/assets/img/alien-cyan.png", 
-            "/assets/img/alien-white.png",
-            "/assets/img/alien-white.png"
+            "./assets/img/alien-magenta.png", 
+            "./assets/img/alien-yellow.png", 
+            "./assets/img/alien-cyan.png", 
+            "./assets/img/alien-white.png",
+            "./assets/img/alien-white.png"
         ];
 
         for(let row = 0; row < rows; row++) {
